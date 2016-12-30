@@ -12,7 +12,7 @@ var options = {
 http.createServer(function (req, res) {
   console.log('Got request for ' + req.url);
   authCheck(req, res);
-}).listen(process.env.PORT || 8080);
+}).listen(process.env.PORT || 80);
 
 function authCheck(req, res) {
   rp.get('https://service.dashcs.com/dash-api/xml/emergencyprovisioning/v1/authenticationcheck ', options)
