@@ -1,26 +1,42 @@
 
 var config = require('./config/config');
 var rp = require('request-promise');
-var http = require('http');
+var restify = require('restify');
 var options = {
   'auth': {
-    'user': 'development',
-    'pass': 'b5@3b2d2D29',
     'sendImmediately': true
   }
 };
 
-http.createServer(function (req, res) {
-  console.log('Got request for ' + req.url);
-  authCheck(req, res);
-}).listen(config.port);
+var server = restify.createServer();
 
-function authCheck(req, res) {
-  rp.get('https://service.dashcs.com/dash-api/xml/emergencyprovisioning/v1/authenticationcheck ', options)
+server.use(restify.authorizationParser());
+server.use(restify.acceptParser(server.acceptable));
+
+server.use(function (req, res, next) {
+  console.log('Got request for ' + req.url);
+  console.log('Auth: ', req.authorization);
+  options.auth.user = req.authorization.basic.username;
+  options.auth.pass = req.authorization.basic.password;
+  return next();
+});
+
+server.get('/', function (req, res, next) {
+  // console.log(req);
+  authCheck(req, res, next);
+});
+
+server.listen(config.port, function () {
+  console.log('Listening on ', config.port);
+});
+
+function authCheck(req, res, next) {
+  rp.get(config.dash.url + 'authenticationcheck ', options)
     .then(function (response) {
       console.log('Response: ', response);
-      res.writeHead(200, { 'Content-Type': 'text/xml' });
-      res.end(response);
+      // res.writeHead(200, { 'Content-Type': 'text/xml' });
+      res.send(response);
+      next();
     })
     .catch(function (err) {
       // API call failed... 

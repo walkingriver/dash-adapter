@@ -9,12 +9,18 @@ var config = {
       name: 'dashtest'
     },
     port: process.env.PORT || 3000,
+    dash: {
+      url: 'https://service.dashcs.com/dash-api/xml/emergencyprovisioning/v1/'
+    },
   },
 
   test: {
     root: rootPath,
     app: {
       name: 'dashtest'
+    },
+    dash: {
+      url: 'https://service.dashcs.com/dash-api/xml/emergencyprovisioning/v1/'
     },
     port: process.env.PORT || 3000,
   },
@@ -23,6 +29,9 @@ var config = {
     root: rootPath,
     app: {
       name: 'dashtest'
+    },
+    dash: {
+      url: 'https://service.dashcs.com/dash-api/xml/emergencyprovisioning/v1/'
     },
     port: process.env.PORT || 3000,
   }
