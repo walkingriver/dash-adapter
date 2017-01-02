@@ -16,9 +16,14 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(function (req, res, next) {
   console.log('Got request for ' + req.url);
   console.log('Auth: ', req.authorization);
-  options.auth.user = req.authorization.basic.username;
-  options.auth.pass = req.authorization.basic.password;
-  return next();
+
+  if (req.authorization && req.authorization.basic) {
+    options.auth.user = req.authorization.basic.username;
+    options.auth.pass = req.authorization.basic.password;
+    return next();
+  } else {
+    res.send(401);
+  }
 });
 
 server.post(/ValidateAddress/i, validateAddress);
