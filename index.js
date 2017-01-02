@@ -1,4 +1,5 @@
 
+var config = require('./config/config');
 var rp = require('request-promise');
 var http = require('http');
 var options = {
@@ -12,7 +13,7 @@ var options = {
 http.createServer(function (req, res) {
   console.log('Got request for ' + req.url);
   authCheck(req, res);
-}).listen(process.env.PORT || 80);
+}).listen(config.port);
 
 function authCheck(req, res) {
   rp.get('https://service.dashcs.com/dash-api/xml/emergencyprovisioning/v1/authenticationcheck ', options)
