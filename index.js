@@ -21,14 +21,21 @@ server.use(function (req, res, next) {
   return next();
 });
 
+server.post(/ValidateAddress/i, validateAddress);
+
 server.get('/', function (req, res, next) {
   // console.log(req);
   authCheck(req, res, next);
 });
 
+
 server.listen(config.port, function () {
   console.log('Listening on ', config.port);
 });
+
+function validateAddress(req, res, next) {
+  res.send('Not Yet Implemented.');
+}
 
 function authCheck(req, res, next) {
   rp.get(config.dash.url + 'authenticationcheck ', options)
