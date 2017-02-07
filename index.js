@@ -33,6 +33,7 @@ server.post(/ValidateAddress/i, validateAddress);
 server.post(/AddAddress/i, addAddress);
 server.post(/ProvisionAddress/i, provisionAddress);
 
+
 server.get('/', function (req, res, next) {
   // console.log(req);
   authCheck(req, res, next);
