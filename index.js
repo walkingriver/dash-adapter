@@ -179,9 +179,34 @@ function addAddress(req, res, next) {
 }
 
 function provisionAddress(req, res, next) {
-  res.status(501);
-  res.send("Method Not Implemented");
-  next();
+  var locationId = {
+    provisionLocation: {
+      locationid: { $t: req.body } // Function takes a single int as a request
+    }
+  };
+  rp.post(config.dash.url + 'provisionlocation', {
+    auth: options.auth,
+    body: parser.toXml(locationId),
+    headers: [
+        {
+          name: 'content-type',
+          value: 'application/xml'
+        }
+      ]
+  })
+  .then(function (response) {
+    var json = parser.toJson(response, { object: true });
+    var status = json['ns2:provisionLocationResponse'].LocationStatus; 
+    console.log(status);
+
+    res.send(status.code);
+    next();
+  })
+  .catch(function (err) {
+    console.log('Error: ', err);
+    res.writeHead(400, { 'Content-Type': 'text/plain' });
+    res.end(err);
+  })
 }
 
 function authCheck(req, res, next) {
