@@ -68,7 +68,7 @@ function validateAddress(req, res, next) {
       ]
   })
   .then(function (response) {
-    var json = parser.toJson(response, { object: true })
+    var json = parser.toJson(response, { object: true });
     var location = json['ns2:validateLocationResponse'].Location; 
     console.log(location);
 
@@ -106,7 +106,7 @@ function validateAddress(req, res, next) {
 }
 
 function addAddress(req, res, next) {
-  var location = {
+  var address = {
     addLocation: {
       uri: {
         callername: { $t: req.body.endpoint.callerName },
@@ -126,7 +126,7 @@ function addAddress(req, res, next) {
 
   rp.post(config.dash.url + 'addlocation', {
     auth: options.auth,
-    body: parser.toXml(location),
+    body: parser.toXml(address),
     headers: [
         {
           name: 'content-type',
@@ -135,8 +135,38 @@ function addAddress(req, res, next) {
       ]
   })
   .then(function (response) {
-    console.log(response);
-    res.send(response);
+    var json = parser.toJson(response, { object: true });
+    var responseLocation = json['ns2:addLocationResponse'].Location; 
+    console.log(responseLocation);
+
+    var location = {
+      addressId: responseLocation.locationid, 
+      addressLine1: responseLocation.address1,
+      addressLine2: responseLocation.address2['xsi:nil'] && null,
+      houseNumber: responseLocation.legacydata.housenumber,
+      prefixDirectional: responseLocation.legacydata.predirectional,
+      streetName: responseLocation.legacydata.streetname,
+      //postDirectional: '', Unknown. Not in the Bandwidth response
+      //streetSuffix: '', Unknown. Not in the Bandwidth response
+      community: responseLocation.community,
+      state: responseLocation.state,
+      //unitType: '', Unknown. Not in the Bandwidth response
+      //unitTypeValue: '', Unknown. Not in the Bandwidth response
+      longitude: responseLocation.longitude,
+      latitude: responseLocation.latitude,
+      postalCode: responseLocation.postalcode,
+      zipPlusFour: responseLocation.plusfour,
+      //description: '', Unknown. Description found in response: "Location is geocoded"
+      addressStatus: responseLocation.status.code,
+      //createdOn: '', Unknown. activatedtime/updatetime found in response
+      //modifiedOn: '', Unknown. activatedtime/updatetime found in response
+      endpoint: {
+        //did: '', Not found in the Bandwidth response, but was part of the request
+        callerName: responseLocation.callername
+      }
+    };
+
+    res.json(location);
     next();
   })
   .catch(function (err) {
