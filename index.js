@@ -31,6 +31,8 @@ server.use(function (req, res, next) {
 
 server.post(/ValidateAddress/i, validateAddress);
 server.post(/AddAddress/i, addAddress);
+server.post(/ProvisionAddress/i, provisionAddress);
+
 
 server.get('/', function (req, res, next) {
   // console.log(req);
@@ -168,6 +170,37 @@ function addAddress(req, res, next) {
     };
 
     res.json(location);
+    next();
+  })
+  .catch(function (err) {
+    console.log('Error: ', err);
+    res.writeHead(400, { 'Content-Type': 'text/plain' });
+    res.end(err);
+  })
+}
+
+function provisionAddress(req, res, next) {
+  var locationId = {
+    provisionLocation: {
+      locationid: { $t: req.body } // Function takes a single int as a request
+    }
+  };
+  rp.post(config.dash.url + 'provisionlocation', {
+    auth: options.auth,
+    body: parser.toXml(locationId),
+    headers: [
+        {
+          name: 'content-type',
+          value: 'application/xml'
+        }
+      ]
+  })
+  .then(function (response) {
+    var json = parser.toJson(response, { object: true });
+    var status = json['ns2:provisionLocationResponse'].LocationStatus; 
+    console.log(status);
+
+    res.send(status.code);
     next();
   })
   .catch(function (err) {
