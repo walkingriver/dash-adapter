@@ -106,11 +106,44 @@ function validateAddress(req, res, next) {
 }
 
 function addAddress(req, res, next) {
-  console.log('addAddress');
-  console.log(req);
-  res.status(501);
-  res.send('Method not implemented');
-  next();
+  var location = {
+    addLocation: {
+      uri: {
+        callername: { $t: req.body.endpoint.callerName },
+        uri: { $t: req.body.endpoint.did },
+      },
+      location: {
+        address1: { $t: req.body.addressLine1 },
+        address2: { $t: req.body.addressLine2 },
+        callername: { $t: req.body.endpoint.callerName },
+        community: { $t: req.body.community },
+        postalcode: { $t: req.body.postalCode },
+        state: { $t: req.body.state },
+        type: { $t: 'ADDRESS' },
+      }
+    }
+  };
+
+  rp.post(config.dash.url + 'addlocation', {
+    auth: options.auth,
+    body: parser.toXml(location),
+    headers: [
+        {
+          name: 'content-type',
+          value: 'application/xml'
+        }
+      ]
+  })
+  .then(function (response) {
+    console.log(response);
+    res.send(response);
+    next();
+  })
+  .catch(function (err) {
+    console.log('Error: ', err);
+    res.writeHead(400, { 'Content-Type': 'text/plain' });
+    res.end(err);
+  })
 }
 
 function authCheck(req, res, next) {
