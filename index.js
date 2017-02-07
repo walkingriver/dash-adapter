@@ -29,6 +29,7 @@ server.use(function (req, res, next) {
 });
 
 server.post(/ValidateAddress/i, validateAddress);
+server.post(/AddAddress/i, addAddress);
 
 server.get('/', function (req, res, next) {
   // console.log(req);
@@ -102,6 +103,14 @@ function validateAddress(req, res, next) {
     res.writeHead(400, { 'Content-Type': 'text/plain' });
     res.end(err);
   });
+}
+
+function addAddress(req, res, next) {
+  console.log('addAddress');
+  console.log(req);
+  res.status(501);
+  res.send('Method not implemented');
+  next();
 }
 
 function authCheck(req, res, next) {
