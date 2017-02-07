@@ -3,6 +3,7 @@ var config = require('./config/config');
 var rp = require('request-promise');
 var restify = require('restify');
 var parser = require('xml2json');
+var _ = require('lodash');
 var options = {
   'auth': {
     'sendImmediately': true
@@ -75,7 +76,7 @@ function validateAddress(req, res, next) {
     var validatedAddress = {
       //addressId: Unknown. Not in the Bandwidth response
       addressLine1: location.address1,
-      addressLine2: Object.keys(location.address2).length === 0 && location.address2.constructor === Object ? '' : location.address2,
+      addressLine2: _.isEmpty(location.address2) ? '' : location.address2,
       houseNumber: location.legacydata.housenumber,
       prefixDirectional: location.legacydata.predirectional,
       streetName: location.legacydata.streetname,
