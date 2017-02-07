@@ -161,7 +161,7 @@ function addAddress(req, res, next) {
       //createdOn: '', Unknown. activatedtime/updatetime found in response
       //modifiedOn: '', Unknown. activatedtime/updatetime found in response
       endpoint: {
-        //did: '', Not found in the Bandwidth response, but was part of the request
+        did: req.body.endpoint.did, // Not found in the Bandwidth response, but was part of the request
         callerName: responseLocation.callername
       }
     };
