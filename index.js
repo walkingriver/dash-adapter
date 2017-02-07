@@ -12,6 +12,7 @@ var server = restify.createServer();
 
 server.use(restify.authorizationParser());
 server.use(restify.acceptParser(server.acceptable));
+server.use(restify.bodyParser({ mapParams: false }));
 
 server.use(function (req, res, next) {
   console.log('Got request for ' + req.url);
