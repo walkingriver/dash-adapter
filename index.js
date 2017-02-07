@@ -143,7 +143,7 @@ function addAddress(req, res, next) {
     var location = {
       addressId: responseLocation.locationid, 
       addressLine1: responseLocation.address1,
-      addressLine2: responseLocation.address2['xsi:nil'] && null,
+      addressLine2: responseLocation.address2['xsi:nil'] ? null : responseLocation.address2,
       houseNumber: responseLocation.legacydata.housenumber,
       prefixDirectional: responseLocation.legacydata.predirectional,
       streetName: responseLocation.legacydata.streetname,
