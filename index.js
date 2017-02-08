@@ -29,9 +29,9 @@ server.use(function (req, res, next) {
   }
 });
 
-server.post(/ValidateAddress/i, validateAddress);
-server.post(/AddAddress/i, addAddress);
-server.post(/ProvisionAddress/i, provisionAddress);
+server.post({ path: '/ValidateAddress', flags: 'i' }, validateAddress);
+server.post({ path: '/AddAddress', flags: 'i' }, addAddress);
+server.post({ path: '/ProvisionAddress', flags: 'i' }, provisionAddress);
 
 
 server.get('/', function (req, res, next) {
