@@ -4,6 +4,7 @@ var rp = require('request-promise');
 var restify = require('restify');
 var parser = require('xml2json');
 var converters = require('./converters');
+var bandwidth = require('./bandwidth');
 var options = {
   'auth': {
     'sendImmediately': true
@@ -125,17 +126,13 @@ function provisionAddress(req, res, next) {
 }
 
 function authCheck(req, res, next) {
-  rp.get(config.dash.url + 'authenticationcheck ', options)
+  bandwidth.get(config.dash.url + 'authenticationcheck ', options)
     .then(function (response) {
-      console.log('Response: ', response);
-      // res.writeHead(200, { 'Content-Type': 'text/xml' });
       res.send(response);
       next();
     })
     .catch(function (err) {
       // API call failed... 
-      console.log('Error: ', err);
-      res.writeHead(400, { 'Content-Type': 'text/plain' });
-      res.end(err);
+      next(err);
     });
 }
