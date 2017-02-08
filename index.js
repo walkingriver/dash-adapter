@@ -88,7 +88,6 @@ function addAddress(req, res, next) {
   .then(function (response) {
     // One property is missing from the XML response, but is contained in the original request.
     var location = converter.createJsObject(response, req.body.endpoint.did);
-
     res.json(location);
     next();
   })
@@ -100,14 +99,12 @@ function addAddress(req, res, next) {
 }
 
 function provisionAddress(req, res, next) {
-  var locationId = {
-    provisionLocation: {
-      locationid: { $t: req.body } // Function takes a single int as a request
-    }
-  };
+  var converter = converters.provisionAddress;
+  
+  var xml = converter.createXmlString(req.body);
   rp.post(config.dash.url + 'provisionlocation', {
     auth: options.auth,
-    body: parser.toXml(locationId),
+    body: xml,
     headers: [
         {
           name: 'content-type',
@@ -116,11 +113,8 @@ function provisionAddress(req, res, next) {
       ]
   })
   .then(function (response) {
-    var json = parser.toJson(response, { object: true });
-    var status = json['ns2:provisionLocationResponse'].LocationStatus; 
-    console.log(status);
-
-    res.send(status.code);
+    var status = converter.createJsObject(response);
+    res.send(status);
     next();
   })
   .catch(function (err) {

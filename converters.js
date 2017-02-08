@@ -104,7 +104,24 @@ addAddress.createJsObject = function(xml, did) {
     return address;
 };
 
+var provisionAddress = {};
+provisionAddress.createXmlString = function(obj) {
+    var locationId = {
+        provisionLocation: {
+            locationid: { $t: obj } // Function takes a single int as a request
+        }
+    };
+    var xml = parser.toXml(locationId);
+    return xml;
+};
+provisionAddress.createJsObject = function(xml) {
+    var json = parser.toJson(xml, { object: true });
+    var status = json['ns2:provisionLocationResponse'].LocationStatus;
+    return status.code; // Function returns only a single string;
+};
+
 module.exports = {
     validateAddress,
-    addAddress
+    addAddress,
+    provisionAddress
 };
