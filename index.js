@@ -34,12 +34,7 @@ server.post({ path: '/ValidateAddress', flags: 'i' }, validateAddress);
 server.post({ path: '/AddAddress', flags: 'i' }, addAddress);
 server.post({ path: '/ProvisionAddress', flags: 'i' }, provisionAddress);
 
-
-server.get('/', function (req, res, next) {
-  // console.log(req);
-  authCheck(req, res, next);
-});
-
+server.get('/', authCheck);
 
 server.listen(config.port, function () {
   console.log('Listening on ', config.port);
