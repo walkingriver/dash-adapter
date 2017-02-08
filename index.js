@@ -71,27 +71,13 @@ function validateAddress(req, res, next) {
 }
 
 function addAddress(req, res, next) {
-  var address = {
-    addLocation: {
-      uri: {
-        callername: { $t: req.body.endpoint.callerName },
-        uri: { $t: req.body.endpoint.did },
-      },
-      location: {
-        address1: { $t: req.body.addressLine1 },
-        address2: { $t: req.body.addressLine2 },
-        callername: { $t: req.body.endpoint.callerName },
-        community: { $t: req.body.community },
-        postalcode: { $t: req.body.postalCode },
-        state: { $t: req.body.state },
-        type: { $t: 'ADDRESS' },
-      }
-    }
-  };
+  var converter = converters.addAddress;
+  
+  var xml = converter.createXmlString(req.body);
 
   rp.post(config.dash.url + 'addlocation', {
     auth: options.auth,
-    body: parser.toXml(address),
+    body: xml,
     headers: [
         {
           name: 'content-type',
@@ -100,36 +86,8 @@ function addAddress(req, res, next) {
       ]
   })
   .then(function (response) {
-    var json = parser.toJson(response, { object: true });
-    var responseLocation = json['ns2:addLocationResponse'].Location; 
-    console.log(responseLocation);
-
-    var location = {
-      addressId: responseLocation.locationid, 
-      addressLine1: responseLocation.address1,
-      addressLine2: responseLocation.address2['xsi:nil'] ? null : responseLocation.address2,
-      houseNumber: responseLocation.legacydata.housenumber,
-      prefixDirectional: responseLocation.legacydata.predirectional,
-      streetName: responseLocation.legacydata.streetname,
-      //postDirectional: '', Unknown. Not in the Bandwidth response
-      //streetSuffix: '', Unknown. Not in the Bandwidth response
-      community: responseLocation.community,
-      state: responseLocation.state,
-      //unitType: '', Unknown. Not in the Bandwidth response
-      //unitTypeValue: '', Unknown. Not in the Bandwidth response
-      longitude: responseLocation.longitude,
-      latitude: responseLocation.latitude,
-      postalCode: responseLocation.postalcode,
-      zipPlusFour: responseLocation.plusfour,
-      //description: '', Unknown. Description found in response: "Location is geocoded"
-      addressStatus: responseLocation.status.code,
-      //createdOn: '', Unknown. activatedtime/updatetime found in response
-      //modifiedOn: '', Unknown. activatedtime/updatetime found in response
-      endpoint: {
-        did: req.body.endpoint.did, // Not found in the Bandwidth response, but was part of the request
-        callerName: responseLocation.callername
-      }
-    };
+    // One property is missing from the XML response, but is contained in the original request.
+    var location = converter.createJsObject(response, req.body.endpoint.did);
 
     res.json(location);
     next();
