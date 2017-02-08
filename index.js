@@ -49,25 +49,14 @@ function validateAddress(req, res, next) {
   var converter = converters.validateAddress;
 
   var xml = converter.createXmlString(req.body);
-  rp.post(config.dash.url + 'validatelocation', {
-    auth: options.auth,
-    body: xml,
-    headers: [
-        {
-          name: 'content-type',
-          value: 'application/xml'
-        }
-      ]
-  })
+  bandwidth.post(config.dash.url + 'validatelocation', options, xml)
   .then(function (response) {
     var obj = converter.createJsObject(response);
     res.json(obj);
     next();
   })
   .catch(function (err) {
-    console.log('Error: ', err);
-    res.writeHead(400, { 'Content-Type': 'text/plain' });
-    res.end(err);
+    next(err);
   });
 }
 
@@ -76,16 +65,7 @@ function addAddress(req, res, next) {
   
   var xml = converter.createXmlString(req.body);
 
-  rp.post(config.dash.url + 'addlocation', {
-    auth: options.auth,
-    body: xml,
-    headers: [
-        {
-          name: 'content-type',
-          value: 'application/xml'
-        }
-      ]
-  })
+  bandwidth.post(config.dash.url + 'addlocation', options, xml)
   .then(function (response) {
     // One property is missing from the XML response, but is contained in the original request.
     var location = converter.createJsObject(response, req.body.endpoint.did);
@@ -93,9 +73,7 @@ function addAddress(req, res, next) {
     next();
   })
   .catch(function (err) {
-    console.log('Error: ', err);
-    res.writeHead(400, { 'Content-Type': 'text/plain' });
-    res.end(err);
+    next(err);
   })
 }
 
@@ -103,25 +81,14 @@ function provisionAddress(req, res, next) {
   var converter = converters.provisionAddress;
   
   var xml = converter.createXmlString(req.body);
-  rp.post(config.dash.url + 'provisionlocation', {
-    auth: options.auth,
-    body: xml,
-    headers: [
-        {
-          name: 'content-type',
-          value: 'application/xml'
-        }
-      ]
-  })
+  bandwidth.post(config.dash.url + 'provisionlocation', options, xml)
   .then(function (response) {
     var status = converter.createJsObject(response);
     res.send(status);
     next();
   })
   .catch(function (err) {
-    console.log('Error: ', err);
-    res.writeHead(400, { 'Content-Type': 'text/plain' });
-    res.end(err);
+    next(err);
   })
 }
 
