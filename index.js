@@ -2,7 +2,6 @@
 var config = require('./config/config');
 var rp = require('request-promise');
 var restify = require('restify');
-var parser = require('xml2json');
 var converters = require('./converters');
 var bandwidth = require('./bandwidth');
 var options = {
