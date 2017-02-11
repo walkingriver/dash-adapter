@@ -4,6 +4,13 @@ var Promise = require("bluebird");
 
 var parseXml = Promise.promisify(xml2js.parseString);
 
+// Checks the object for XML null tags.
+// If found, the function returns null. Otherwise, returns the original object.
+function checkIfNull(obj) {
+    if (obj.$ && obj.$['xsi:nil']) return null;
+    return obj;
+}
+
 var validateAddress = {};
 validateAddress.createXmlString = function (obj) {
     var builder = new xml2js.Builder({ rootName: 'validateLocation' });
@@ -24,12 +31,11 @@ validateAddress.createJsObject = function (xml) {
         .then(result => {
             var location = result['ns2:validateLocationResponse'].Location[0];
             return {
-                addressId: location.locationid[0].$['xsi:nil'] ? null : location.locationid[0],
+                addressId: checkIfNull(location.locationid[0]),
                 addressLine1: location.address1[0],
                 addressLine2: location.address2[0],
                 houseNumber: location.legacydata[0].housenumber[0],
-                prefixDirectional: location.legacydata[0].predirectional[0].$ && location.legacydata[0].predirectional[0].$['xsi:nil']
-                    ? null : location.legacydata[0].predirectional[0],
+                prefixDirectional: checkIfNull(location.legacydata[0].predirectional[0]),
                 streetName: location.legacydata[0].streetname[0],
                 //postDirectional: Unknown. Not in the Bandwidth response
                 //streetSuffix: Unknown. Not in the Bandwidth response
@@ -76,10 +82,9 @@ addAddress.createJsObject = function (xml, did) {
             return {
                 addressId: location.locationid[0],
                 addressLine1: location.address1[0],
-                addressLine2: location.address2[0].$ && location.address2[0].$['xsi:nil'] ? null : location.address2[0],
+                addressLine2: checkIfNull(location.address2[0]),
                 houseNumber: location.legacydata[0].housenumber[0],
-                prefixDirectional: location.legacydata[0].predirectional[0].$ && location.legacydata[0].predirectional[0].$['xsi:nil']
-                    ? null : location.legacydata[0].predirectional[0],
+                prefixDirectional: checkIfNull(location.legacydata[0].predirectional[0]),
                 streetName: location.legacydata[0].streetname[0],
                 //postDirectional: '', Unknown. Not in the Bandwidth response
                 //streetSuffix: '', Unknown. Not in the Bandwidth response
@@ -141,10 +146,9 @@ getAddressesByDid.createJsObject = function (xml, did) {
                 return {
                     addressId: locations.locationid[0],
                     addressLine1: locations.address1[0],
-                    addressLine2: locations.address2[0].$ && locations.address2[0].$['xsi:nil'] ? null : locations.address2[0],
+                    addressLine2: checkIfNull(locations.address2[0]),
                     houseNumber: locations.legacydata[0].housenumber[0],
-                    prefixDirectional: locations.legacydata[0].predirectional[0].$ && locations.legacydata[0].predirectional[0].$['xsi:nil']
-                        ? null : locations.legacydata[0].predirectional[0],
+                    prefixDirectional: checkIfNull(locations.legacydata[0].predirectional[0]),
                     streetName: locations.legacydata[0].streetname[0],
                     //postDirectional: '', Unknown. Not in the Bandwidth response
                     //streetSuffix: '', Unknown. Not in the Bandwidth response
