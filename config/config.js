@@ -10,7 +10,7 @@ var config = {
     },
     port: process.env.PORT || 3000,
     dash: {
-      url: 'https://service.dashcs.com/dash-api/xml/emergencyprovisioning/v1/'
+      url: 'https://staging-service.dashcs.com/dash-api/xml/emergencyprovisioning/v1'
     },
   },
 
