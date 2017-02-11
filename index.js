@@ -35,6 +35,7 @@ server.post({ path: '/ProvisionAddress', flags: 'i' }, provisionAddress);
 
 server.get('/', authCheck);
 server.get({ path: '/GetEndpoints', flags: 'i' }, getEndpoints);
+server.get({ path: '/GetAddressesByDid', flags: 'i' }, getAddressesByDid);
 
 server.listen(config.port, function () {
   console.log('Listening on ', config.port);
@@ -95,10 +96,22 @@ function authCheck(req, res, next) {
 
 function getEndpoints(req, res, next) {
   var converter = converters.getEndpoints;
-  
+
   bandwidth.get(config.dash.url + 'uris', options)
     .then(response => converter.createJsObject(response))
     .then(endpoints => {
+      res.send(endpoints);
+      next();
+    })
+    .catch(err => next(err));
+}
+
+function getAddressesByDid(req, res, next) {
+  var converter = converters.getAddressesByDid;
+
+  bandwidth.get(config.dash.url + 'locationsbyuri/' + req.body, options)
+    .then(response => converter.createJsObject(response))
+    .then(addresses => {
       res.send(endpoints);
       next();
     })

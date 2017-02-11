@@ -75,7 +75,7 @@ addAddress.createJsObject = function (xml, did) {
             return {
                 addressId: location.locationid[0],
                 addressLine1: location.address1[0],
-                addressLine2: location.address2[0].$['xsi:nil'] ? null : location.address2[0],
+                addressLine2: location.address2[0].$ && location.address2[0].$['xsi:nil'] ? null : location.address2[0],
                 houseNumber: location.legacydata[0].housenumber[0],
                 prefixDirectional: location.legacydata[0].predirectional[0],
                 streetName: location.legacydata[0].streetname[0],
@@ -131,9 +131,19 @@ getEndpoints.createJsObject = function (xml) {
         })
 }
 
+var getAddressesByDid = {};
+getAddressesByDid.createJsObject = function (xml) {
+    return parseXml(xml)
+        .then(result => {
+            console.log(result);
+            return result;
+        });
+}
+
 module.exports = {
     validateAddress,
     addAddress,
     provisionAddress,
-    getEndpoints
+    getEndpoints,
+    getAddressesByDid
 };
