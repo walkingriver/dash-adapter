@@ -34,6 +34,7 @@ server.post({ path: '/AddAddress', flags: 'i' }, addAddress);
 server.post({ path: '/ProvisionAddress', flags: 'i' }, provisionAddress);
 
 server.get('/', authCheck);
+server.get({ path: '/GetEndpoints', flags: 'i' }, getEndpoints);
 
 server.listen(config.port, function () {
   console.log('Listening on ', config.port);
@@ -43,16 +44,6 @@ function validateAddress(req, res, next) {
   var converter = converters.validateAddress;
 
   var xml = converter.createXmlString(req.body);
-  // bandwidth.post(config.dash.url + 'validatelocation', options, xml)
-  // .then(function (response) {
-  //   var obj = converter.createJsObject(response);
-  //   res.json(obj);
-  //   next();
-  // })
-  // .catch(function (err) {
-  //   next(err);
-  // });
-
   bandwidth.post(config.dash.url + 'validatelocation', options, xml)
     .then(response => converter.createJsObject(response))
     .then(address => {
@@ -70,7 +61,7 @@ function addAddress(req, res, next) {
   bandwidth.post(config.dash.url + 'addlocation', options, xml)
     // One property is missing from the XML response, but is contained in the original request.
     .then(response => converter.createJsObject(response, req.body.endpoint.did))
-    .then(address => {      
+    .then(address => {
       res.json(address);
       next();
     })
@@ -100,4 +91,16 @@ function authCheck(req, res, next) {
       // API call failed... 
       next(err);
     });
+}
+
+function getEndpoints(req, res, next) {
+  var converter = converters.getEndpoints;
+  
+  bandwidth.get(config.dash.url + 'uris', options)
+    .then(response => converter.createJsObject(response))
+    .then(endpoints => {
+      res.send(endpoints);
+      next();
+    })
+    .catch(err => next(err));
 }
