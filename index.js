@@ -82,14 +82,12 @@ function provisionAddress(req, res, next) {
 
   var xml = converter.createXmlString(req.body);
   bandwidth.post(config.dash.url + 'provisionlocation', options, xml)
-    .then(function (response) {
-      var status = converter.createJsObject(response);
+    .then(response => converter.createJsObject(response))
+    .then(status => {
       res.send(status);
       next();
     })
-    .catch(function (err) {
-      next(err);
-    })
+    .catch(err => next(err));
 }
 
 function authCheck(req, res, next) {

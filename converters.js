@@ -103,18 +103,18 @@ addAddress.createJsObject = function (xml, did) {
 
 var provisionAddress = {};
 provisionAddress.createXmlString = function (obj) {
-    // var locationId = {
-    //     provisionLocation: {
-    //         locationid: { $t: obj } // Function takes a single int as a request
-    //     }
-    // };
-    // var xml = parser.toXml(locationId);
-    // return xml;
+    var builder = new xml2js.Builder({ rootName: 'provisionLocation' });
+    var locationId = {
+        locationid: obj // Function takes a single int as a request
+    }
+    return builder.buildObject(locationId);
 };
 provisionAddress.createJsObject = function (xml) {
-    // var json = parser.toJson(xml, { object: true });
-    // var status = json['ns2:provisionLocationResponse'].LocationStatus;
-    // return status.code; // Function returns only a single string;
+    return parseXml(xml)
+        .then(result => {
+            var status = result['ns2:provisionLocationResponse'].LocationStatus[0];
+            return status.code[0]; // Function returns only a single string;
+        });
 };
 
 module.exports = {
