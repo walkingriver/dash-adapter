@@ -28,7 +28,8 @@ validateAddress.createJsObject = function (xml) {
                 addressLine1: location.address1[0],
                 addressLine2: location.address2[0],
                 houseNumber: location.legacydata[0].housenumber[0],
-                prefixDirectional: location.legacydata[0].predirectional[0],
+                prefixDirectional: location.legacydata[0].predirectional[0].$ && location.legacydata[0].predirectional[0].$['xsi:nil']
+                    ? null : location.legacydata[0].predirectional[0],
                 streetName: location.legacydata[0].streetname[0],
                 //postDirectional: Unknown. Not in the Bandwidth response
                 //streetSuffix: Unknown. Not in the Bandwidth response
@@ -122,10 +123,10 @@ var getEndpoints = {};
 getEndpoints.createJsObject = function (xml) {
     return parseXml(xml)
         .then(result => {
-            var endpoints = _.map(result['ns2:getURIsResponse'].URIs, uris => {
+            var endpoints = _.map(result['ns2:getURIsResponse'].URIs[0].uris, uri => {
                 return {
-                    did: uris.uris[0].uri[0],
-                    callerName: uris.uris[0].callername[0]
+                    did: uri.uri[0],
+                    callerName: uri.callername[0]
                 }
             })
             return endpoints;
