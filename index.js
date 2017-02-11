@@ -68,15 +68,13 @@ function addAddress(req, res, next) {
   var xml = converter.createXmlString(req.body);
 
   bandwidth.post(config.dash.url + 'addlocation', options, xml)
-    .then(function (response) {
-      // One property is missing from the XML response, but is contained in the original request.
-      var location = converter.createJsObject(response, req.body.endpoint.did);
-      res.json(location);
+    // One property is missing from the XML response, but is contained in the original request.
+    .then(response => converter.createJsObject(response, req.body.endpoint.did))
+    .then(address => {      
+      res.json(address);
       next();
     })
-    .catch(function (err) {
-      next(err);
-    })
+    .catch(err => next(err));
 }
 
 function provisionAddress(req, res, next) {
