@@ -117,8 +117,23 @@ provisionAddress.createJsObject = function (xml) {
         });
 };
 
+var getEndpoints = {};
+getEndpoints.createJsObject = function (xml) {
+    return parseXml(xml)
+        .then(result => {
+            var endpoints = _.map(result['ns2:getURIsResponse'].URIs, uris => {
+                return {
+                    did: uris.uris[0].uri[0],
+                    callerName: uris.uris[0].callername[0]
+                }
+            })
+            return endpoints;
+        })
+}
+
 module.exports = {
     validateAddress,
     addAddress,
-    provisionAddress
+    provisionAddress,
+    getEndpoints
 };
