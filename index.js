@@ -110,9 +110,10 @@ function getAddressesByDid(req, res, next) {
   var converter = converters.getAddressesByDid;
 
   bandwidth.get(config.dash.url + 'locationsbyuri/' + req.body, options)
-    .then(response => converter.createJsObject(response))
+    // One property is missing from the XML response, but is contained in the original request.
+    .then(response => converter.createJsObject(response, req.body))
     .then(addresses => {
-      res.send(endpoints);
+      res.send(addresses);
       next();
     })
     .catch(err => next(err));
