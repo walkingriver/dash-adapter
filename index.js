@@ -124,7 +124,7 @@ function getProvisionedAddressByDid(req, res, next) {
   var converter = converters.getProvisionedAddressByDid;
   var did = req.params.did;
   bandwidth.get(config.dash.url + 'provisionedlocationbyuri/' + did, options)
-  .then(response => converter.createJsObject(response,did))
+  .then(response => converter.createJsObject(response, did))
   .then(address => {
     res.send(address);
     next();
