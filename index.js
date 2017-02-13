@@ -36,6 +36,7 @@ server.post({ path: '/ProvisionAddress', flags: 'i' }, provisionAddress);
 server.get('/', authCheck);
 server.get({ path: '/GetEndpoints', flags: 'i' }, getEndpoints);
 server.get({ path: '/GetAddressesByDid/:did', flags: 'i' }, getAddressesByDid);
+server.get({ path: '/GetProvisionedAddressByDid/:did', flags: 'i'}, getProvisionedAddressByDid);
 
 server.listen(config.port, function () {
   console.log('Listening on ', config.port);
@@ -117,4 +118,16 @@ function getAddressesByDid(req, res, next) {
       next();
     })
     .catch(err => next(err));
+}
+
+function getProvisionedAddressByDid(req, res, next) {
+  var converter = converters.getProvisionedAddressByDid;
+  var did = req.params.did;
+  bandwidth.get(config.dash.url + 'provisionedlocationbyuri/' + did, options)
+  .then(response => converter.createJsObject(response,did))
+  .then(address => {
+    res.send(address);
+    next();
+  })
+  .catch(err => next(err));
 }
