@@ -35,7 +35,7 @@ server.post({ path: '/ProvisionAddress', flags: 'i' }, provisionAddress);
 
 server.get('/', authCheck);
 server.get({ path: '/GetEndpoints', flags: 'i' }, getEndpoints);
-server.get({ path: '/GetAddressesByDid', flags: 'i' }, getAddressesByDid);
+server.get({ path: '/GetAddressesByDid/:did', flags: 'i' }, getAddressesByDid);
 
 server.listen(config.port, function () {
   console.log('Listening on ', config.port);
@@ -108,10 +108,10 @@ function getEndpoints(req, res, next) {
 
 function getAddressesByDid(req, res, next) {
   var converter = converters.getAddressesByDid;
-
-  bandwidth.get(config.dash.url + 'locationsbyuri/' + req.body, options)
+  var did = req.params.did;
+  bandwidth.get(config.dash.url + 'locationsbyuri/' + did, options)
     // One property is missing from the XML response, but is contained in the original request.
-    .then(response => converter.createJsObject(response, req.body))
+    .then(response => converter.createJsObject(response, did))
     .then(addresses => {
       res.send(addresses);
       next();
