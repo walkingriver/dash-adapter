@@ -39,7 +39,7 @@ server.get({ path: '/GetAddressesByDid/:did', flags: 'i' }, getAddressesByDid);
 server.get({ path: '/GetProvisionedAddressByDid/:did', flags: 'i' }, getProvisionedAddressByDid);
 server.get({ path: '/GetProvisionedAddressHistoryByDid/:did', flags: 'i' }, getProvisionedAddressHistoryByDid);
 
-server.delete({ path: '/RemoveAddress/:id', flags: 'i'}, removeAddress);
+server.del({ path: '/RemoveAddress/:id', flags: 'i'}, removeAddress);
 
 server.listen(config.port, function () {
   console.log('Listening on ', config.port);
