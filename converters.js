@@ -245,6 +245,22 @@ getProvisionedAddressHistoryByDid.createJsObject = function (xml, did) {
         });
 }
 
+var removeAddress = {};
+removeAddress.createXmlString = function (obj) {
+    var builder = new xml2js.Builder({ rootName: 'removelocation' });
+    var locationId = {
+        locationid: obj // Function takes a single int as a request
+    }
+    return builder.buildObject(locationId);
+}
+removeAddress.createJsObject = function (xml) {
+    return parseXml(xml)
+        .then(result => {
+            var status = result['ns2:removeLocationResponse'].LocationStatus[0];
+            return status.code[0]; // Function returns only a single string;
+        })
+}
+
 var removeEndpoint = {};
 removeEndpoint.createXmlString = function (obj) {
     var builder = new xml2js.Builder({ rootName: 'removeURI' });
@@ -269,5 +285,6 @@ module.exports = {
     getAddressesByDid,
     getProvisionedAddressByDid,
     getProvisionedAddressHistoryByDid,
+    removeAddress,
     removeEndpoint
 };
