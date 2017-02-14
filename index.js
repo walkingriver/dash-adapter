@@ -36,7 +36,8 @@ server.post({ path: '/ProvisionAddress', flags: 'i' }, provisionAddress);
 server.get('/', authCheck);
 server.get({ path: '/GetEndpoints', flags: 'i' }, getEndpoints);
 server.get({ path: '/GetAddressesByDid/:did', flags: 'i' }, getAddressesByDid);
-server.get({ path: '/GetProvisionedAddressByDid/:did', flags: 'i'}, getProvisionedAddressByDid);
+server.get({ path: '/GetProvisionedAddressByDid/:did', flags: 'i' }, getProvisionedAddressByDid);
+server.get({ path: '/GetProvisionedAddressHistoryByDid/:did', flags: 'i' }, getProvisionedAddressHistoryByDid);
 
 server.listen(config.port, function () {
   console.log('Listening on ', config.port);
@@ -124,10 +125,22 @@ function getProvisionedAddressByDid(req, res, next) {
   var converter = converters.getProvisionedAddressByDid;
   var did = req.params.did;
   bandwidth.get(config.dash.url + 'provisionedlocationbyuri/' + did, options)
-  .then(response => converter.createJsObject(response, did))
-  .then(address => {
-    res.send(address);
-    next();
-  })
-  .catch(err => next(err));
+    .then(response => converter.createJsObject(response, did))
+    .then(address => {
+      res.send(address);
+      next();
+    })
+    .catch(err => next(err));
+}
+
+function getProvisionedAddressHistoryByDid(req, res, next) {
+  var converter = converters.getProvisionedAddressHistoryByDid;
+  var did = req.params.did;
+  bandwidth.get(config.dash.url + 'provisionedlocationhistorybyuri/' + did, options)
+    .then(response => converter.createJsObject(response, did))
+    .then(history => {
+      res.send(history);
+      next();
+    })
+    .catch(err => next(err));
 }
