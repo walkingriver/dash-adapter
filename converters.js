@@ -245,6 +245,22 @@ getProvisionedAddressHistoryByDid.createJsObject = function (xml, did) {
         });
 }
 
+var removeEndpoint = {};
+removeEndpoint.createXmlString = function (obj) {
+    var builder = new xml2js.Builder({ rootName: 'removeURI' });
+    var uri = {
+        uri: obj // Function takes a single int as a request
+    };
+    return builder.buildObject(uri);
+}
+removeEndpoint.createJsObject = function (xml) {
+    return parseXml(xml)
+        .then(result => {
+            console.log(result);
+            return result;
+        });
+}
+
 module.exports = {
     validateAddress,
     addAddress,
@@ -252,5 +268,6 @@ module.exports = {
     getEndpoints,
     getAddressesByDid,
     getProvisionedAddressByDid,
-    getProvisionedAddressHistoryByDid
+    getProvisionedAddressHistoryByDid,
+    removeEndpoint
 };
