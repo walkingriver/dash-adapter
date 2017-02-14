@@ -39,6 +39,8 @@ server.get({ path: '/GetAddressesByDid/:did', flags: 'i' }, getAddressesByDid);
 server.get({ path: '/GetProvisionedAddressByDid/:did', flags: 'i' }, getProvisionedAddressByDid);
 server.get({ path: '/GetProvisionedAddressHistoryByDid/:did', flags: 'i' }, getProvisionedAddressHistoryByDid);
 
+server.delete({ path: '/RemoveAddress/:id', flags: 'i'}, removeAddress);
+
 server.listen(config.port, function () {
   console.log('Listening on ', config.port);
 });
@@ -143,4 +145,16 @@ function getProvisionedAddressHistoryByDid(req, res, next) {
       next();
     })
     .catch(err => next(err));
+}
+
+function removeAddress(req, res, next) {
+  var converter = converters.removeAddress;
+  var xml = converter.createXmlString(req.params.id);
+  bandwidth.post(config.dash.url + 'removelocation', options, xml)
+  .then(response => converter.createJsObject(response))
+  .then(result => {
+    res.send(result);
+    next();
+  })
+  .catch(err => next(err));
 }
