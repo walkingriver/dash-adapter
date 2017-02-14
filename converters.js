@@ -258,6 +258,22 @@ removeAddress.createJsObject = function (xml) {
         .then(result => {
             var status = result['ns2:removeLocationResponse'].LocationStatus[0];
             return status.code[0]; // Function returns only a single string;
+        })
+}
+
+var removeEndpoint = {};
+removeEndpoint.createXmlString = function (obj) {
+    var builder = new xml2js.Builder({ rootName: 'removeURI' });
+    var uri = {
+        uri: obj // Function takes a single int as a request
+    };
+    return builder.buildObject(uri);
+}
+removeEndpoint.createJsObject = function (xml) {
+    return parseXml(xml)
+        .then(result => {
+            var status = result['ns2:removeURIResponse'].URIStatus[0];
+            return status.code[0]; // Function returns only a single string
         });
 }
 
@@ -269,5 +285,6 @@ module.exports = {
     getAddressesByDid,
     getProvisionedAddressByDid,
     getProvisionedAddressHistoryByDid,
-    removeAddress
+    removeAddress,
+    removeEndpoint
 };
