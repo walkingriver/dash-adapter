@@ -174,10 +174,46 @@ getAddressesByDid.createJsObject = function (xml, did) {
         });
 }
 
+var getProvisionedAddressByDid = {};
+getProvisionedAddressByDid.createJsObject = function (xml, did) {
+    return parseXml(xml)
+        .then(result => {
+            var location = result['ns2:getProvisionedLocationByURIResponse'].Location[0];
+            var address = {
+                addressId: location.locationid[0],
+                addressLine1: location.address1[0],
+                addressLine2: checkIfNull(location.address2[0]),
+                houseNumber: location.legacydata[0].housenumber[0],
+                prefixDirectional: checkIfNull(location.legacydata[0].predirectional[0]),
+                streetName: location.legacydata[0].streetname[0],
+                //postDirectional: '', Unknown. Not in the Bandwidth response
+                //streetSuffix: '', Unknown. Not in the Bandwidth response
+                community: location.community[0],
+                state: location.state[0],
+                //unitType: '', Unknown. Not in the Bandwidth response
+                //unitTypeValue: '', Unknown. Not in the Bandwidth response
+                longitude: location.longitude[0],
+                latitude: location.latitude[0],
+                postalCode: location.postalcode[0],
+                zipPlusFour: location.plusfour[0],
+                //description: '', Unknown. Description found in response: "Location is geocoded"
+                addressStatus: location.status[0].code[0],
+                //createdOn: '', Unknown. activatedtime/updatetime found in response
+                //modifiedOn: '', Unknown. activatedtime/updatetime found in response
+                endpoint: {
+                    did: did, // Not found in the Bandwidth response, but was part of the request
+                    callerName: location.callername[0]
+                }
+            }
+            return address;
+        });
+};
+
 module.exports = {
     validateAddress,
     addAddress,
     provisionAddress,
     getEndpoints,
-    getAddressesByDid
+    getAddressesByDid,
+    getProvisionedAddressByDid
 };
