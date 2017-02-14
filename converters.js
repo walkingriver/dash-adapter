@@ -256,8 +256,8 @@ removeEndpoint.createXmlString = function (obj) {
 removeEndpoint.createJsObject = function (xml) {
     return parseXml(xml)
         .then(result => {
-            console.log(result);
-            return result;
+            var status = result['ns2:removeURIResponse'].URIStatus[0];
+            return status.code[0]; // Function returns only a single string
         });
 }
 

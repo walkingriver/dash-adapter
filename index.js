@@ -149,7 +149,7 @@ function getProvisionedAddressHistoryByDid(req, res, next) {
 
 function removeEndpoint(req, res, next) {
   var converter = converters.removeEndpoint;
-  var xml = converters.createXmlString(req.params.did);
+  var xml = converter.createXmlString(req.params.did);
   bandwidth.post(config.dash.url + 'removeuri', options, xml)
     .then(response => converter.createJsObject(response))
     .then(result => {
