@@ -15,6 +15,41 @@ function createAddressStatus(status) {
     return status.code[0];
 }
 
+function createAddress(location, did) {
+    var address = {
+        addressId: checkIfNull(location.locationid[0]),
+        addressLine1: location.address1[0],
+        addressLine2: checkIfNull(location.address2[0]),
+        houseNumber: location.legacydata[0].housenumber[0],
+        prefixDirectional: checkIfNull(location.legacydata[0].predirectional[0]),
+        streetName: location.legacydata[0].streetname[0],
+        //postDirectional: '', Unknown. Not in the Bandwidth response
+        //streetSuffix: '', Unknown. Not in the Bandwidth response
+        community: location.community[0],
+        state: location.state[0],
+        //unitType: '', Unknown. Not in the Bandwidth response
+        //unitTypeValue: '', Unknown. Not in the Bandwidth response
+        longitude: location.longitude[0],
+        latitude: location.latitude[0],
+        postalCode: location.postalcode[0],
+        zipPlusFour: location.plusfour[0],
+        //description: '', Unknown. Description found in response: "Location is geocoded"
+        addressStatus: createAddressStatus(location.status[0]),
+        //createdOn: '', Unknown. activatedtime/updatetime found in response
+        //modifiedOn: '', Unknown. activatedtime/updatetime found in response
+    };
+
+    // Include endpoint information if a DID was provided.
+    if (did) {
+        address.endpoint = {
+            did, // Not found in the Bandwidth response, but was part of the request.
+            callerName: location.callername[0]
+        };
+    }
+
+    return address;
+}
+
 var validateAddress = {};
 validateAddress.createXmlString = function (obj) {
     var builder = new xml2js.Builder({ rootName: 'validateLocation' });
@@ -34,28 +69,7 @@ validateAddress.createJsObject = function (xml) {
     return parseXml(xml)
         .then(result => {
             var location = result['ns2:validateLocationResponse'].Location[0];
-            return {
-                addressId: checkIfNull(location.locationid[0]),
-                addressLine1: location.address1[0],
-                addressLine2: location.address2[0],
-                houseNumber: location.legacydata[0].housenumber[0],
-                prefixDirectional: checkIfNull(location.legacydata[0].predirectional[0]),
-                streetName: location.legacydata[0].streetname[0],
-                //postDirectional: Unknown. Not in the Bandwidth response
-                //streetSuffix: Unknown. Not in the Bandwidth response
-                community: location.community[0],
-                state: location.state[0],
-                //unitType: Unknown. Not in the Bandwidth response
-                //unitTypeValue: Unknown. Not in the Bandwidth response
-                longitude: location.longitude[0],
-                latitude: location.latitude[0],
-                postalCode: location.postalcode[0],
-                zipPlusFour: location.plusfour[0],
-                //description: Unknown. Description found in response: "Location is geocoded"
-                addressStatus: createAddressStatus(location.status[0]),
-                //createdOn: Unknown. activatedtime/updatetime found in response
-                //modifiedOn: Unknown. activatedtime/updatetime found in response
-            };
+            return createAddress(location);
         });
 }
 
@@ -83,32 +97,7 @@ addAddress.createJsObject = function (xml, did) {
     return parseXml(xml)
         .then(result => {
             var location = result['ns2:addLocationResponse'].Location[0];
-            return {
-                addressId: location.locationid[0],
-                addressLine1: location.address1[0],
-                addressLine2: checkIfNull(location.address2[0]),
-                houseNumber: location.legacydata[0].housenumber[0],
-                prefixDirectional: checkIfNull(location.legacydata[0].predirectional[0]),
-                streetName: location.legacydata[0].streetname[0],
-                //postDirectional: '', Unknown. Not in the Bandwidth response
-                //streetSuffix: '', Unknown. Not in the Bandwidth response
-                community: location.community[0],
-                state: location.state[0],
-                //unitType: '', Unknown. Not in the Bandwidth response
-                //unitTypeValue: '', Unknown. Not in the Bandwidth response
-                longitude: location.longitude[0],
-                latitude: location.latitude[0],
-                postalCode: location.postalcode[0],
-                zipPlusFour: location.plusfour[0],
-                //description: '', Unknown. Description found in response: "Location is geocoded"
-                addressStatus: createAddressStatus(location.status[0]),
-                //createdOn: '', Unknown. activatedtime/updatetime found in response
-                //modifiedOn: '', Unknown. activatedtime/updatetime found in response
-                endpoint: {
-                    did: did, // Not found in the Bandwidth response, but was part of the request
-                    callerName: location.callername[0]
-                }
-            };
+            return createAddress(location, did);
         });
 };
 
@@ -146,34 +135,9 @@ var getAddressesByDid = {};
 getAddressesByDid.createJsObject = function (xml, did) {
     return parseXml(xml)
         .then(result => {
-            var addresses = _.map(result['ns2:getLocationsByURIResponse'].Locations, locations => {
-                return {
-                    addressId: locations.locationid[0],
-                    addressLine1: locations.address1[0],
-                    addressLine2: checkIfNull(locations.address2[0]),
-                    houseNumber: locations.legacydata[0].housenumber[0],
-                    prefixDirectional: checkIfNull(locations.legacydata[0].predirectional[0]),
-                    streetName: locations.legacydata[0].streetname[0],
-                    //postDirectional: '', Unknown. Not in the Bandwidth response
-                    //streetSuffix: '', Unknown. Not in the Bandwidth response
-                    community: locations.community[0],
-                    state: locations.state[0],
-                    //unitType: '', Unknown. Not in the Bandwidth response
-                    //unitTypeValue: '', Unknown. Not in the Bandwidth response
-                    longitude: locations.longitude[0],
-                    latitude: locations.latitude[0],
-                    postalCode: locations.postalcode[0],
-                    zipPlusFour: locations.plusfour[0],
-                    //description: '', Unknown. Description found in response: "Location is geocoded"
-                    addressStatus: createAddressStatus(location.status[0]),
-                    //createdOn: '', Unknown. activatedtime/updatetime found in response
-                    //modifiedOn: '', Unknown. activatedtime/updatetime found in response
-                    endpoint: {
-                        did: did, // Not found in the Bandwidth response, but was part of the request
-                        callerName: locations.callername[0]
-                    }
-                }
-            });
+            var addresses = _.map(result['ns2:getLocationsByURIResponse'].Locations,
+                locations => createAddress(locations)
+            );
             return addresses;
         });
 }
@@ -183,33 +147,7 @@ getProvisionedAddressByDid.createJsObject = function (xml, did) {
     return parseXml(xml)
         .then(result => {
             var location = result['ns2:getProvisionedLocationByURIResponse'].Location[0];
-            var address = {
-                addressId: location.locationid[0],
-                addressLine1: location.address1[0],
-                addressLine2: checkIfNull(location.address2[0]),
-                houseNumber: location.legacydata[0].housenumber[0],
-                prefixDirectional: checkIfNull(location.legacydata[0].predirectional[0]),
-                streetName: location.legacydata[0].streetname[0],
-                //postDirectional: '', Unknown. Not in the Bandwidth response
-                //streetSuffix: '', Unknown. Not in the Bandwidth response
-                community: location.community[0],
-                state: location.state[0],
-                //unitType: '', Unknown. Not in the Bandwidth response
-                //unitTypeValue: '', Unknown. Not in the Bandwidth response
-                longitude: location.longitude[0],
-                latitude: location.latitude[0],
-                postalCode: location.postalcode[0],
-                zipPlusFour: location.plusfour[0],
-                //description: '', Unknown. Description found in response: "Location is geocoded"
-                addressStatus: createAddressStatus(location.status[0]),
-                //createdOn: '', Unknown. activatedtime/updatetime found in response
-                //modifiedOn: '', Unknown. activatedtime/updatetime found in response
-                endpoint: {
-                    did: did, // Not found in the Bandwidth response, but was part of the request
-                    callerName: location.callername[0]
-                }
-            }
-            return address;
+            return createAddress(location);
         });
 };
 
@@ -217,34 +155,9 @@ var getProvisionedAddressHistoryByDid = {};
 getProvisionedAddressHistoryByDid.createJsObject = function (xml, did) {
     return parseXml(xml)
         .then(result => {
-            var addresses = _.map(result['ns2:getProvisionedLocationHistoryByURIResponse'].ProvisionedLocations, locations => {
-                return {
-                    addressId: locations.locationid[0],
-                    addressLine1: locations.address1[0],
-                    addressLine2: checkIfNull(locations.address2[0]),
-                    houseNumber: locations.legacydata[0].housenumber[0],
-                    prefixDirectional: checkIfNull(locations.legacydata[0].predirectional[0]),
-                    streetName: locations.legacydata[0].streetname[0],
-                    //postDirectional: '', Unknown. Not in the Bandwidth response
-                    //streetSuffix: '', Unknown. Not in the Bandwidth response
-                    community: locations.community[0],
-                    state: locations.state[0],
-                    //unitType: '', Unknown. Not in the Bandwidth response
-                    //unitTypeValue: '', Unknown. Not in the Bandwidth response
-                    longitude: locations.longitude[0],
-                    latitude: locations.latitude[0],
-                    postalCode: locations.postalcode[0],
-                    zipPlusFour: locations.plusfour[0],
-                    //description: '', Unknown. Description found in response: "Location is geocoded"
-                    addressStatus: createAddressStatus(location.status[0]),
-                    //createdOn: '', Unknown. activatedtime/updatetime found in response
-                    //modifiedOn: '', Unknown. activatedtime/updatetime found in response
-                    endpoint: {
-                        did: did, // Not found in the Bandwidth response, but was part of the request
-                        callerName: locations.callername[0]
-                    }
-                }
-            });
+            var addresses = _.map(result['ns2:getProvisionedLocationHistoryByURIResponse'].ProvisionedLocations,
+                locations => createAddress(locations)
+            );
             return addresses;
         });
 }
