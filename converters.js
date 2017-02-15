@@ -11,6 +11,10 @@ function checkIfNull(obj) {
     return obj;
 }
 
+function createAddressStatus(status) {
+    return status.code[0];
+}
+
 var validateAddress = {};
 validateAddress.createXmlString = function (obj) {
     var builder = new xml2js.Builder({ rootName: 'validateLocation' });
@@ -48,7 +52,7 @@ validateAddress.createJsObject = function (xml) {
                 postalCode: location.postalcode[0],
                 zipPlusFour: location.plusfour[0],
                 //description: Unknown. Description found in response: "Location is geocoded"
-                addressStatus: location.status[0].code[0],
+                addressStatus: createAddressStatus(location.status[0]),
                 //createdOn: Unknown. activatedtime/updatetime found in response
                 //modifiedOn: Unknown. activatedtime/updatetime found in response
             };
@@ -97,7 +101,7 @@ addAddress.createJsObject = function (xml, did) {
                 postalCode: location.postalcode[0],
                 zipPlusFour: location.plusfour[0],
                 //description: '', Unknown. Description found in response: "Location is geocoded"
-                addressStatus: location.status[0].code[0],
+                addressStatus: createAddressStatus(location.status[0]),
                 //createdOn: '', Unknown. activatedtime/updatetime found in response
                 //modifiedOn: '', Unknown. activatedtime/updatetime found in response
                 endpoint: {
@@ -120,7 +124,7 @@ provisionAddress.createJsObject = function (xml) {
     return parseXml(xml)
         .then(result => {
             var status = result['ns2:provisionLocationResponse'].LocationStatus[0];
-            return status.code[0]; // Function returns only a single string;
+            return createAddressStatus(status); // Function returns only a single string;
         });
 };
 
@@ -161,7 +165,7 @@ getAddressesByDid.createJsObject = function (xml, did) {
                     postalCode: locations.postalcode[0],
                     zipPlusFour: locations.plusfour[0],
                     //description: '', Unknown. Description found in response: "Location is geocoded"
-                    addressStatus: locations.status[0].code[0],
+                    addressStatus: createAddressStatus(location.status[0]),
                     //createdOn: '', Unknown. activatedtime/updatetime found in response
                     //modifiedOn: '', Unknown. activatedtime/updatetime found in response
                     endpoint: {
@@ -197,7 +201,7 @@ getProvisionedAddressByDid.createJsObject = function (xml, did) {
                 postalCode: location.postalcode[0],
                 zipPlusFour: location.plusfour[0],
                 //description: '', Unknown. Description found in response: "Location is geocoded"
-                addressStatus: location.status[0].code[0],
+                addressStatus: createAddressStatus(location.status[0]),
                 //createdOn: '', Unknown. activatedtime/updatetime found in response
                 //modifiedOn: '', Unknown. activatedtime/updatetime found in response
                 endpoint: {
@@ -232,7 +236,7 @@ getProvisionedAddressHistoryByDid.createJsObject = function (xml, did) {
                     postalCode: locations.postalcode[0],
                     zipPlusFour: locations.plusfour[0],
                     //description: '', Unknown. Description found in response: "Location is geocoded"
-                    addressStatus: locations.status[0].code[0],
+                    addressStatus: createAddressStatus(location.status[0]),
                     //createdOn: '', Unknown. activatedtime/updatetime found in response
                     //modifiedOn: '', Unknown. activatedtime/updatetime found in response
                     endpoint: {
@@ -257,7 +261,7 @@ removeAddress.createJsObject = function (xml) {
     return parseXml(xml)
         .then(result => {
             var status = result['ns2:removeLocationResponse'].LocationStatus[0];
-            return status.code[0]; // Function returns only a single string;
+            return createAddressStatus(status); // Function returns only a single string;
         })
 }
 
@@ -273,7 +277,7 @@ removeEndpoint.createJsObject = function (xml) {
     return parseXml(xml)
         .then(result => {
             var status = result['ns2:removeURIResponse'].URIStatus[0];
-            return status.code[0]; // Function returns only a single string
+            return createAddressStatus(status); // Function returns only a single string
         });
 }
 
