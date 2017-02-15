@@ -12,34 +12,34 @@ function checkIfNull(obj) {
 }
 
 function createAddressStatus(status) {
-    return status.code[0];
+    return checkIfNull(status.code[0]);
 }
 
 function createEndpoint(obj, did) {
     return {
-        did: did || obj.uri[0], // Use explicit DID if available
-        callerName: obj.callername[0]
+        did: did || checkIfNull(obj.uri[0]), // Use explicit DID if available
+        callerName: checkIfNull(obj.callername[0])
     };
 }
 
 function createAddress(location, did) {
     var address = {
         addressId: checkIfNull(location.locationid[0]),
-        addressLine1: location.address1[0],
+        addressLine1: checkIfNull(location.address1[0]),
         addressLine2: checkIfNull(location.address2[0]),
-        houseNumber: location.legacydata[0].housenumber[0],
+        houseNumber: checkIfNull(location.legacydata[0].housenumber[0]),
         prefixDirectional: checkIfNull(location.legacydata[0].predirectional[0]),
-        streetName: location.legacydata[0].streetname[0],
+        streetName: checkIfNull(location.legacydata[0].streetname[0]),
         //postDirectional: '', Unknown. Not in the Bandwidth response
         //streetSuffix: '', Unknown. Not in the Bandwidth response
-        community: location.community[0],
-        state: location.state[0],
+        community: checkIfNull(location.community[0]),
+        state: checkIfNull(location.state[0]),
         //unitType: '', Unknown. Not in the Bandwidth response
         //unitTypeValue: '', Unknown. Not in the Bandwidth response
-        longitude: location.longitude[0],
-        latitude: location.latitude[0],
-        postalCode: location.postalcode[0],
-        zipPlusFour: location.plusfour[0],
+        longitude: checkIfNull(location.longitude[0]),
+        latitude: checkIfNull(location.latitude[0]),
+        postalCode: checkIfNull(location.postalcode[0]),
+        zipPlusFour: checkIfNull(location.plusfour[0]),
         //description: '', Unknown. Description found in response: "Location is geocoded"
         addressStatus: createAddressStatus(location.status[0]),
         //createdOn: '', Unknown. activatedtime/updatetime found in response
