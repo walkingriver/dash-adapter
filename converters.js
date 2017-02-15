@@ -15,6 +15,13 @@ function createAddressStatus(status) {
     return status.code[0];
 }
 
+function createEndpoint(obj, did) {
+    return {
+        did: did || obj.uri[0], // Use explicit DID if available
+        callerName: obj.callername[0]
+    };
+}
+
 function createAddress(location, did) {
     var address = {
         addressId: checkIfNull(location.locationid[0]),
@@ -41,10 +48,7 @@ function createAddress(location, did) {
 
     // Include endpoint information if a DID was provided.
     if (did) {
-        address.endpoint = {
-            did, // Not found in the Bandwidth response, but was part of the request.
-            callerName: location.callername[0]
-        };
+        address.endpoint = createEndpoint(location, did);
     }
 
     return address;
@@ -121,12 +125,9 @@ var getEndpoints = {};
 getEndpoints.createJsObject = function (xml) {
     return parseXml(xml)
         .then(result => {
-            var endpoints = _.map(result['ns2:getURIsResponse'].URIs[0].uris, uri => {
-                return {
-                    did: uri.uri[0],
-                    callerName: uri.callername[0]
-                }
-            })
+            var endpoints = _.map(result['ns2:getURIsResponse'].URIs[0].uris,
+                uri => createEndpoint(uri)
+            )
             return endpoints;
         })
 }
