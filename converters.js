@@ -30,9 +30,9 @@ function createAddress(location, did) {
         addressId: checkIfNull(location.locationid[0]) || 0, // return 0 instead of null
         addressLine1: checkIfNull(location.address1[0]),
         addressLine2: checkIfNull(location.address2[0]),
-        houseNumber: checkIfNull(location.legacydata[0].housenumber[0]),
-        prefixDirectional: checkIfNull(location.legacydata[0].predirectional[0]),
-        streetName: checkIfNull(location.legacydata[0].streetname[0]),
+        houseNumber: checkIfNull(location.legacydata[0]) && checkIfNull(location.legacydata[0].housenumber[0]),
+        prefixDirectional: checkIfNull(location.legacydata[0]) && checkIfNull(location.legacydata[0].predirectional[0]),
+        streetName: checkIfNull(location.legacydata[0]) && checkIfNull(location.legacydata[0].streetname[0]),
         //postDirectional: '', Unknown. Not in the Bandwidth response
         //streetSuffix: '', Unknown. Not in the Bandwidth response
         community: checkIfNull(location.community[0]),
