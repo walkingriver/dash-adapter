@@ -27,7 +27,7 @@ function createEndpoint(obj, did) {
 
 function createAddress(location, did) {
     var address = {
-        addressId: checkIfNull(location.locationid[0]),
+        addressId: checkIfNull(location.locationid[0]) || 0, // return 0 instead of null
         addressLine1: checkIfNull(location.address1[0]),
         addressLine2: checkIfNull(location.address2[0]),
         houseNumber: checkIfNull(location.legacydata[0].housenumber[0]),
