@@ -16,8 +16,11 @@ function createAddressStatus(status) {
 }
 
 function createEndpoint(obj, did) {
+    // Use explicit DID if available
+    did = did || checkIfNull(obj.uri[0]);
     return {
-        did: did || checkIfNull(obj.uri[0]), // Use explicit DID if available
+        // Remove tel: prefix if present
+        did: did.replace("tel:", ""),
         callerName: checkIfNull(obj.callername[0])
     };
 }
