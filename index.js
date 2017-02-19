@@ -12,6 +12,7 @@ var options = {
 
 var server = restify.createServer();
 
+// Pre-request handlers
 server.use(restify.authorizationParser());
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.bodyParser({ mapParams: false }));
@@ -29,6 +30,7 @@ server.use(function (req, res, next) {
   }
 });
 
+// Request handlers
 server.post({ path: '/ValidateAddress', flags: 'i' }, validateAddress);
 server.post({ path: '/AddAddress', flags: 'i' }, addAddress);
 server.post({ path: '/ProvisionAddress', flags: 'i' }, provisionAddress);
@@ -41,6 +43,21 @@ server.get({ path: '/GetProvisionedAddressHistoryByDid/:did', flags: 'i' }, getP
 
 server.del({ path: '/RemoveAddress/:id', flags: 'i'}, removeAddress);
 server.del({ path: '/RemoveEndpoint/:did', flags: 'i' }, removeEndpoint);
+
+function handleError(req, res, next, err) {
+  var converter = converters.errors;
+  converter.createJsObject(err.error)
+  .then(e => {
+    var error;
+    if (e.type == 'NotFound') {
+      error = new restify.NotFoundError(e.message);
+    }
+    else {
+      error = new restify.InternalServerError(e.message);
+    }
+    next(error);
+  })
+}
 
 server.listen(config.port, function () {
   console.log('Listening on ', config.port);
@@ -56,7 +73,7 @@ function validateAddress(req, res, next) {
       res.json(address);
       next();
     })
-    .catch(err => next(err));
+    .catch(err => handleError(req, res, next, err));
 }
 
 function addAddress(req, res, next) {
@@ -71,7 +88,7 @@ function addAddress(req, res, next) {
       res.json(address);
       next();
     })
-    .catch(err => next(err));
+    .catch(err => handleError(req, res, next, err));
 }
 
 function provisionAddress(req, res, next) {
@@ -84,7 +101,7 @@ function provisionAddress(req, res, next) {
       res.send(status);
       next();
     })
-    .catch(err => next(err));
+    .catch(err => handleError(req, res, next, err));
 }
 
 function authCheck(req, res, next) {
@@ -93,10 +110,7 @@ function authCheck(req, res, next) {
       res.send(response);
       next();
     })
-    .catch(function (err) {
-      // API call failed... 
-      next(err);
-    });
+    .catch(err => handleError(req, res, next, err));
 }
 
 function getEndpoints(req, res, next) {
@@ -108,7 +122,7 @@ function getEndpoints(req, res, next) {
       res.send(endpoints);
       next();
     })
-    .catch(err => next(err));
+    .catch(err => handleError(req, res, next, err));
 }
 
 function getAddressesByDid(req, res, next) {
@@ -121,7 +135,7 @@ function getAddressesByDid(req, res, next) {
       res.send(addresses);
       next();
     })
-    .catch(err => next(err));
+    .catch(err => handleError(req, res, next, err));
 }
 
 function getProvisionedAddressByDid(req, res, next) {
@@ -133,7 +147,7 @@ function getProvisionedAddressByDid(req, res, next) {
       res.send(address);
       next();
     })
-    .catch(err => next(err));
+    .catch(err => handleError(req, res, next, err));
 }
 
 function getProvisionedAddressHistoryByDid(req, res, next) {
@@ -145,7 +159,7 @@ function getProvisionedAddressHistoryByDid(req, res, next) {
       res.send(history);
       next();
     })
-    .catch(err => next(err));
+    .catch(err => handleError(req, res, next, err));
 }
 
 function removeAddress(req, res, next) {
@@ -157,7 +171,7 @@ function removeAddress(req, res, next) {
     res.send(result);
     next();
   })
-  .catch(err => next(err));
+    .catch(err => handleError(req, res, next, err));
 }
 
 function removeEndpoint(req, res, next) {
@@ -169,5 +183,5 @@ function removeEndpoint(req, res, next) {
       res.send(result);
       next();
     })
-    .catch(err => next(err));
+    .catch(err => handleError(req, res, next, err));
 }

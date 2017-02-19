@@ -198,6 +198,23 @@ removeEndpoint.createJsObject = function (xml) {
         });
 }
 
+var errors = {};
+errors.createJsObject = function (xml) {
+    return parseXml(xml)
+    .then (result => {
+        var fault = result['ns1:XMLFault'];
+        var error = {
+            message: fault['ns1:faultstring'][0]._
+        };
+
+        if (fault['ns1:detail'][0]['ns1:NotFoundException']){
+            error.type = "NotFound";
+        }
+
+        return error;
+    });
+}
+
 module.exports = {
     validateAddress,
     addAddress,
@@ -207,5 +224,6 @@ module.exports = {
     getProvisionedAddressByDid,
     getProvisionedAddressHistoryByDid,
     removeAddress,
-    removeEndpoint
+    removeEndpoint,
+    errors
 };
