@@ -20,7 +20,7 @@ var config = {
       name: 'dashtest'
     },
     dash: {
-      url: 'https://service.dashcs.com/dash-api/xml/emergencyprovisioning/v1/'
+      url: 'https://staging-service.dashcs.com/dash-api/xml/emergencyprovisioning/v1'
     },
     port: process.env.PORT || 3000,
   },
@@ -31,7 +31,7 @@ var config = {
       name: 'dashtest'
     },
     dash: {
-      url: 'https://service.dashcs.com/dash-api/xml/emergencyprovisioning/v1/'
+      url: 'https://staging-service.dashcs.com/dash-api/xml/emergencyprovisioning/v1'
     },
     port: process.env.PORT || 3000,
   }

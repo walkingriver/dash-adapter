@@ -16,20 +16,23 @@ function createAddressStatus(status) {
 }
 
 function createEndpoint(obj, did) {
+    // Use explicit DID if available
+    did = did || checkIfNull(obj.uri[0]);
     return {
-        did: did || checkIfNull(obj.uri[0]), // Use explicit DID if available
+        // Remove tel: prefix if present
+        did: did.replace("tel:", ""),
         callerName: checkIfNull(obj.callername[0])
     };
 }
 
 function createAddress(location, did) {
     var address = {
-        addressId: checkIfNull(location.locationid[0]),
+        addressId: checkIfNull(location.locationid[0]) || 0, // return 0 instead of null
         addressLine1: checkIfNull(location.address1[0]),
         addressLine2: checkIfNull(location.address2[0]),
-        houseNumber: checkIfNull(location.legacydata[0].housenumber[0]),
-        prefixDirectional: checkIfNull(location.legacydata[0].predirectional[0]),
-        streetName: checkIfNull(location.legacydata[0].streetname[0]),
+        houseNumber: checkIfNull(location.legacydata[0]) && checkIfNull(location.legacydata[0].housenumber[0]),
+        prefixDirectional: checkIfNull(location.legacydata[0]) && checkIfNull(location.legacydata[0].predirectional[0]),
+        streetName: checkIfNull(location.legacydata[0]) && checkIfNull(location.legacydata[0].streetname[0]),
         //postDirectional: '', Unknown. Not in the Bandwidth response
         //streetSuffix: '', Unknown. Not in the Bandwidth response
         community: checkIfNull(location.community[0]),
@@ -195,6 +198,23 @@ removeEndpoint.createJsObject = function (xml) {
         });
 }
 
+var errors = {};
+errors.createJsObject = function (xml) {
+    return parseXml(xml)
+    .then (result => {
+        var fault = result['ns1:XMLFault'];
+        var error = {
+            message: fault['ns1:faultstring'][0]._
+        };
+
+        if (fault['ns1:detail'][0]['ns1:NotFoundException']){
+            error.type = "NotFound";
+        }
+
+        return error;
+    });
+}
+
 module.exports = {
     validateAddress,
     addAddress,
@@ -204,5 +224,6 @@ module.exports = {
     getProvisionedAddressByDid,
     getProvisionedAddressHistoryByDid,
     removeAddress,
-    removeEndpoint
+    removeEndpoint,
+    errors
 };
